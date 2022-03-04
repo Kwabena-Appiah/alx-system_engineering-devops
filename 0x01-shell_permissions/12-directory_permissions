@@ -1,2 +1,2 @@
 #!/bin/bash
-mkdir drwxr-x--x
+mkdir my_dir -m = 751
