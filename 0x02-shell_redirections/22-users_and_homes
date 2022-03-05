@@ -1,2 +1,2 @@
 #!/bin/bash
-sort /etc/passwd 
+du /etc/passwd | sort -d':' -f 1,6 
