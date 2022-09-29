@@ -1,16 +1,29 @@
 #!/usr/bin/env bash
-# Script that displays information about subdomains.
+# this script outputs a string that returns domain records info
 
-func () {
-    if [ -n "$2" ]
+world_wide_web () {
+
+    if [ "$2" ]
     then
-	dig "$2.$1" | grep -A1 'ANSWER SECTION:' | paste - - | awk -v sd="$2" '{print "The subdomain " sd " is a " $7 " record and points to " $8}'
+	rec=$(dig "$2.$1" | grep 'ANSWER SECTION:' -A1 | awk '{if (NR > 1) {print $4}}')
+	#echo "$rec"
+	ip=$(dig "$2.$1" | grep 'ANSWER SECTION:' -A1 | awk '{if (NR > 1) {print $5}}')
+	#echo "$ip"
+	echo "The subdomain $2 is a $rec record and points to $ip"
     else
-	dig "www.$1" | grep -A1 'ANSWER SECTION:' | paste - - | awk '{print "The subdomain www is a " $7 " record and points to " $8}'
-	dig "lb-01.$1" | grep -A1 'ANSWER SECTION:' | paste - - | awk '{print "The subdomain lb-01 is a " $7 " record and points to " $8}'
-	dig "web-01.$1" | grep -A1 'ANSWER SECTION:' | paste - - | awk '{print "The subdomain web-01 is a " $7 " record and points to " $8}'
-	dig "web-02.$1" | grep -A1 'ANSWER SECTION:' | paste - - | awk '{print "The subdomain web-02 is a " $7 " record and points to " $8}'
+	for i in "www" "lb-01" "web-01" "web-02"; do
+	    rec=$( dig "$i.$1" | grep 'ANSWER SECTION:' -A1 | awk '{if (NR > 1) {print $4}}')
+	    ip=$( dig "$i.$1" | grep 'ANSWER SECTION:' -A1 | awk '{if (NR > 1) {print $5}}')
+	    echo "The subdomain $i is a $rec record and points to $ip"
+	done
     fi
+
+    return 0
 }
 
-func "$1" "$2"
+if [ "$2" ]
+then
+    world_wide_web "$1" "$2"
+else
+    world_wide_web "$1"
+fi
